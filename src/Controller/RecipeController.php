@@ -2,18 +2,29 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Entity\Recipe;
+
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class RecipeController extends AbstractController
 {
-    #[Route('/api/create', name: 'app_recipe', method:['POST'])]
-    public function create(): JsonResponse
+    #[Route('/api/create', name: 'app_recipe', methods:['POST'])]
+    public function create(Request $Request, EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/RecipeController.php',
-        ]);
+        //!! TODO Gérer données "unique" sur category et ingredient
+        $recipe = $serializer->deserialize($Request->getContent(), Recipe::class, 'json');
+        
+        $em->persist($recipe);
+        $em->flush();
+
+        $jsonRecipe = $serializer->serialize($recipe, 'json');
+
+        return new JsonResponse($jsonRecipe, Response::HTTP_CREATED, [], true);
     }
 }
