@@ -18,17 +18,12 @@ class RecipeController extends AbstractController
     #[Route('/api/create', name: 'app_recipe', methods:['POST'])]
     public function create(Request $Request, EntityManagerInterface $em, SerializerInterface $serializer, CategoryRepository $categoryRepository): JsonResponse
     {
-        //!! TODO Gérer données "unique" sur category et ingredient
+       
         $recipe = $serializer->deserialize($Request->getContent(), Recipe::class, 'json');
 
-        // Récupération de l'ensemble des données envoyées sous forme de tableau
+        // Les 3 lignes de codes ci-dessous permettent d'assigner les clé étrangères, d'une recette à une catégorie
         $content = $Request->toArray();
-
-        // Récupération de l'idAuthor. S'il n'est pas défini, alors on met -1 par défaut.
         $idCategory = $content['idCategory'];
-
-        // On cherche l'auteur qui correspond et on l'assigne au livre.
-        // Si "find" ne trouve pas l'auteur, alors null sera retourné.
         $recipe->addCategory($categoryRepository->find($idCategory));
         
         $em->persist($recipe);
