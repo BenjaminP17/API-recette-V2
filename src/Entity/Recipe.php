@@ -36,11 +36,12 @@ class Recipe
     #[Groups(["recipe"])]
     private ?int $servings = null;
 
-    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'recipes', cascade:['persist'])]
+    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'recipes')]
     #[Groups(["recipe"])]
     private Collection $category;
 
     #[ORM\ManyToMany(targetEntity: Ingredient::class, inversedBy: 'recipes')]
+    #[Groups(["recipe"])]
     private Collection $ingredient;
 
     public function __construct()
