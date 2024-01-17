@@ -54,4 +54,15 @@ class RecipeController extends AbstractController
         
         return new JsonResponse($jsonRecipesList, Response::HTTP_OK, [], true);
     }
+
+    // Route qui renvoi une recette
+    #[Route('/api/recipe/{id}', name: 'one_recipe', methods: ['GET'])]
+    public function getOneRecipe($id, RecipeRepository $RecipeRepository, SerializerInterface $serializer): JsonResponse
+    {
+        $recipe = $RecipeRepository->find($id);
+
+        $JsonRecipe = $serializer->serialize($recipe,'json', ['groups' => 'recipe']);
+
+        return new JsonResponse($JsonRecipe, Response::HTTP_OK, [], true);
+    }
 }
