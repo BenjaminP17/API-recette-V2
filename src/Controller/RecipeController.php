@@ -23,10 +23,10 @@ class RecipeController extends AbstractController
         $recipe = $serializer->deserialize($Request->getContent(), Recipe::class, 'json');
 
         $content = $Request->toArray();
-        
+
         $idCategory = $content['idCategory'];
 
-        // Modification pour prendre en charge plusieurs idIngredients
+        // Association de plusieurs ingrédients à une recette
         if (isset($content['idIngredient']) && is_array($content['idIngredient'])) {
             foreach ($content['idIngredient'] as $idIngredient) {
                 $recipe->addIngredient($ingredientRepository->find($idIngredient));
