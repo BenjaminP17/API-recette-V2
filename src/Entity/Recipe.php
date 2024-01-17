@@ -18,14 +18,15 @@ class Recipe
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["recipe"])]
+    #[Groups(["recipe", "all_recipe"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 2083, nullable: true)]
+    #[Groups(["recipe", "all_recipe"])]
     private ?string $picture = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(["recipe"])]
+    #[Groups(["recipe", "all_recipe"])]
     private ?string $description = null;
 
     #[ORM\Column]
@@ -44,7 +45,8 @@ class Recipe
     #[Groups(["recipe"])]
     private Collection $ingredient;
 
-    #[ORM\OneToMany(mappedBy: 'recipe', targetEntity: Step::class)]
+    #[ORM\OneToMany(mappedBy: 'recipe', targetEntity: Step::class, cascade:['persist'])]
+    #[Groups(["recipe"])]
     private Collection $step;
 
     public function __construct()

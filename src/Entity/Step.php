@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\StepRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: StepRepository::class)]
 class Step
@@ -14,9 +15,11 @@ class Step
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(["recipe"])]
     private ?int $priority = null;
 
     #[ORM\Column(length: 500)]
+    #[Groups(["recipe"])]
     private ?string $instruction = null;
 
     #[ORM\ManyToOne(inversedBy: 'step')]
