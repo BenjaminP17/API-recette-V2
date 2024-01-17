@@ -24,6 +24,7 @@ class Ingredient
     private Collection $recipes;
 
     #[ORM\ManyToMany(targetEntity: Measure::class, inversedBy: 'ingredients')]
+    #[Groups(["recipe"])]
     private Collection $measure;
 
     public function __construct()

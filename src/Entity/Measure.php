@@ -6,6 +6,7 @@ use App\Repository\MeasureRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MeasureRepository::class)]
 class Measure
@@ -16,9 +17,11 @@ class Measure
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(["recipe"])]
     private ?int $quantity = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["recipe"])]
     private ?string $unit = null;
 
     #[ORM\ManyToMany(targetEntity: Ingredient::class, mappedBy: 'measure')]

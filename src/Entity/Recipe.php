@@ -44,10 +44,14 @@ class Recipe
     #[Groups(["recipe"])]
     private Collection $ingredient;
 
+    #[ORM\OneToMany(mappedBy: 'recipe', targetEntity: Step::class)]
+    private Collection $step;
+
     public function __construct()
     {
         $this->category = new ArrayCollection();
         $this->ingredient = new ArrayCollection();
+        $this->step = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -159,6 +163,36 @@ class Recipe
     public function removeIngredient(Ingredient $ingredient): static
     {
         $this->ingredient->removeElement($ingredient);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Step>
+     */
+    public function getStep(): Collection
+    {
+        return $this->step;
+    }
+
+    public function addStep(Step $step): static
+    {
+        if (!$this->step->contains($step)) {
+            $this->step->add($step);
+            $step->setRecipe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStep(Step $step): static
+    {
+        if ($this->step->removeElement($step)) {
+            // set the owning side to null (unless already changed)
+            if ($step->getRecipe() === $this) {
+                $step->setRecipe(null);
+            }
+        }
 
         return $this;
     }
