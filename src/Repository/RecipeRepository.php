@@ -45,4 +45,13 @@ class RecipeRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+    public function findOneById($recipeId): ?Recipe
+    {
+    return $this->createQueryBuilder('r')
+        ->andWhere('r.id = :val')
+        ->setParameter('val', $recipeId)
+        ->getQuery()
+        ->getOneOrNullResult();
+    }
 }

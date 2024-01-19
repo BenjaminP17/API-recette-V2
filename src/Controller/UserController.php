@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Recipe;
+use App\Repository\RecipeRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,5 +46,42 @@ class UserController extends AbstractController
         return $this->json($user, 200, []);
 
 
+    }
+
+    //Ajout d'une recette en favori
+    #[Route('/api/favorite/add/{id}', name: 'app_favoris_add', methods:['GET'])]
+    public function addFavorite (
+        Request $Request, RecipeRepository $RecipeRepository,
+        EntityManagerInterface $em
+    ) : JsonResponse
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            $this->json([
+                'message' => 'Utilisateur non connecté. Fournir le Token JWT.'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $RecipeId = $Request->get('id');
+
+        $recipe = $RecipeRepository->findOneById($RecipeId);
+
+        if (!$recipe) {
+            $recipe = new Recipe();
+
+            $recipe->setId($RecipeId);
+
+            $em->persist($recipe);
+            $em->flush();
+        }
+
+        $user->addRecipe($recipe);
+
+        $em->flush();
+
+        return $this->json([
+            "La recette '$RecipeId' a bien été ajoutée aux favoris de l'utilisateur",
+        ], 201);
     }
 }

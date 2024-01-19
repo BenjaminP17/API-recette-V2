@@ -19,7 +19,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class RecipeController extends AbstractController
 {
     #[Route('/api/create', name: 'app_recipe', methods:['POST'])]
-    public function create(Request $Request, EntityManagerInterface $em, SerializerInterface $serializer, CategoryRepository $categoryRepository, IngredientRepository $ingredientRepository): JsonResponse
+    public function create(Request $Request, 
+    EntityManagerInterface $em, 
+    SerializerInterface $serializer, 
+    CategoryRepository $categoryRepository, 
+    IngredientRepository $ingredientRepository): JsonResponse
     {
         $recipe = $serializer->deserialize($Request->getContent(), Recipe::class, 'json');
 
@@ -46,7 +50,8 @@ class RecipeController extends AbstractController
 
     // Route qui renvoi la liste de toute les recettes (titre et description)
     #[Route('/api/recipes', name: 'all_recipes', methods: ['GET'])]
-    public function getAllRecipe(RecipeRepository $RecipeRepository, SerializerInterface $serializer): JsonResponse
+    public function getAllRecipe(RecipeRepository $RecipeRepository, 
+    SerializerInterface $serializer): JsonResponse
     {
         $recipesList = $RecipeRepository->findAll();
         
