@@ -17,7 +17,8 @@ class Recipe
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    // "UNIQUE" permet de définir en BDD qu'il ne peut y avoir un doublon de données (ex : deux fois la donnée "carotte")
+    #[ORM\Column(length: 255, unique: true)]
     #[Groups(["recipe", "all_recipe"])]
     private ?string $name = null;
 
