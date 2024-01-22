@@ -4,12 +4,14 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\Recipe;
-use App\Repository\RecipeRepository;
 use App\Repository\UserRepository;
+use App\Repository\RecipeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -46,6 +48,20 @@ class UserController extends AbstractController
         return $this->json($user, 200, []);
 
 
+    }
+
+    //Route qui liste tous les utilisateurs
+    #[Route('/api/list/users', name: 'app_users_list', methods:['GET'])]
+    public function list (
+        UserRepository $UserRepository,
+        SerializerInterface $serializer
+    ) : JsonResponse
+    {
+        $usersList = $UserRepository->findAll();
+
+        $jsonUsersList = $serializer->serialize($usersList, 'json', ['groups'=>'all_users']);
+        
+        return new JsonResponse($jsonUsersList, Response::HTTP_OK, [], true);
     }
 
     //Ajout d'une recette en favori
