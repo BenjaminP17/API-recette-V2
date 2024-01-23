@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -22,7 +23,9 @@ class UserController extends AbstractController
     public function register(Request $request,
     UserPasswordHasherInterface $passwordHasher,
     EntityManagerInterface $em,
-    UserRepository $userRepository): JsonResponse
+    UserRepository $userRepository,
+    SerializerInterface $serializer,
+    ValidatorInterface $validator): JsonResponse
     {
         $user = new User ();
 
@@ -41,6 +44,13 @@ class UserController extends AbstractController
         $user->setPassword($hashedPassword);
         $user->setRoles(['ROLE_USER']);
         $user->setNickname($nickname);
+
+        // On vérifie les erreurs
+        $errors = $validator->validate($user);
+
+        if ($errors->count() > 0) {
+            return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+        }
 
         $em->persist($user);
         $em->flush();
@@ -65,6 +75,7 @@ class UserController extends AbstractController
     }
 
     //Ajout d'une recette en favori
+    // pour cette route, il faut fournir le token, et renseigner l'id d'une recette en fin d'url
     #[Route('/api/favorite/add/{id}', name: 'app_favoris_add', methods:['GET'])]
     public function addFavorite (
         Request $Request, RecipeRepository $RecipeRepository,
