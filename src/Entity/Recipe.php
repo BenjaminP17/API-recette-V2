@@ -17,7 +17,8 @@ class Recipe
     #[ORM\Column]
     private ?int $id = null;
 
-    // "UNIQUE" permet de définir en BDD qu'il ne peut y avoir un doublon de données (ex : deux fois la donnée "carotte")
+    // "UNIQUE" permet de définir en BDD qu'il ne peut y avoir un doublon de données 
+    //(ex : deux fois la donnée "carotte")
     #[ORM\Column(length: 255, unique: true)]
     #[Groups(["recipe", "all_recipe"])]
     private ?string $name = null;
@@ -53,12 +54,16 @@ class Recipe
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'recipe')]
     private Collection $users;
 
+    #[ORM\OneToMany(mappedBy: 'recipe', targetEntity: Review::class)]
+    private Collection $review;
+
     public function __construct()
     {
         $this->category = new ArrayCollection();
         $this->ingredient = new ArrayCollection();
         $this->step = new ArrayCollection();
         $this->users = new ArrayCollection();
+        $this->review = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -226,6 +231,36 @@ class Recipe
     {
         if ($this->users->removeElement($user)) {
             $user->removeRecipe($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Review>
+     */
+    public function getReview(): Collection
+    {
+        return $this->review;
+    }
+
+    public function addReview(Review $review): static
+    {
+        if (!$this->review->contains($review)) {
+            $this->review->add($review);
+            $review->setRecipe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReview(Review $review): static
+    {
+        if ($this->review->removeElement($review)) {
+            // set the owning side to null (unless already changed)
+            if ($review->getRecipe() === $this) {
+                $review->setRecipe(null);
+            }
         }
 
         return $this;

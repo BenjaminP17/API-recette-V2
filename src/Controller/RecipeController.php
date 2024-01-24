@@ -70,4 +70,16 @@ class RecipeController extends AbstractController
 
         return new JsonResponse($JsonRecipe, Response::HTTP_OK, [], true);
     }
+
+    // Route qui permet la recherche de recettes (barre de recherche)
+
+    #[Route('/api/search/recipe', name: 'search_recipe', methods: ['GET'])]
+
+    public function searchRecipe(SerializerInterface $serializer,
+    Request $Request, EntityManagerInterface $em): JsonResponse
+    {
+        $keyWord = $Request->query->get('term');
+    }
+    
+
 }

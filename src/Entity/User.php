@@ -50,9 +50,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(["all_users"])]
     private Collection $recipe;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Review::class)]
+    private Collection $review;
+
     public function __construct()
     {
         $this->recipe = new ArrayCollection();
+        $this->review = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -157,6 +161,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeRecipe(Recipe $recipe): static
     {
         $this->recipe->removeElement($recipe);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Review>
+     */
+    public function getReview(): Collection
+    {
+        return $this->review;
+    }
+
+    public function addReview(Review $review): static
+    {
+        if (!$this->review->contains($review)) {
+            $this->review->add($review);
+            $review->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReview(Review $review): static
+    {
+        if ($this->review->removeElement($review)) {
+            // set the owning side to null (unless already changed)
+            if ($review->getUser() === $this) {
+                $review->setUser(null);
+            }
+        }
 
         return $this;
     }
