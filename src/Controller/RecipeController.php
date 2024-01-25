@@ -18,6 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class RecipeController extends AbstractController
 {
+    // Création d'une nouvelle recette
     #[Route('/api/create', name: 'app_recipe', methods:['POST'])]
     public function create(Request $Request, 
     EntityManagerInterface $em, 
@@ -48,7 +49,25 @@ class RecipeController extends AbstractController
         return new JsonResponse($jsonRecipe, Response::HTTP_CREATED, [], true);
     }
 
-    // Route qui renvoi la liste de toute les recettes (titre et description)
+    // Création d'un nouvel ingrédient
+    #[Route('/api/create/ingredient', name: 'create_ingredient', methods:['POST'])]
+    public function createIngredient(Request $Request,
+    EntityManagerInterface $em, 
+    SerializerInterface $serializer, 
+    IngredientRepository $ingredientRepository): JsonResponse
+    {
+        $ingredient = $serializer->deserialize($Request->getContent(), Ingredient::class, 'json');
+
+        $em->persist($ingredient);
+        $em->flush();
+
+        $jsonIngredient = $serializer->serialize($ingredient, 'json', ['groups' => 'ingredient']);
+
+        return new JsonResponse($jsonIngredient, Response::HTTP_CREATED, [], true);
+
+    }
+
+    // liste de toute les recettes (titre et description)
     #[Route('/api/recipes', name: 'all_recipes', methods: ['GET'])]
     public function getAllRecipe(RecipeRepository $RecipeRepository, 
     SerializerInterface $serializer): JsonResponse

@@ -44,6 +44,7 @@ class UserController extends AbstractController
 
         $user->setEmail($email);
         $user->setPassword($hashedPassword);
+        // par défaut ROLE_USER est déterminé à un nouvel user
         $user->setRoles(['ROLE_USER']);
         $user->setNickname($nickname);
 
