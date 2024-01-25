@@ -52,9 +52,11 @@ class Recipe
     private Collection $step;
 
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'recipe')]
+    #[Groups(["review_recipe"])]
     private Collection $users;
 
     #[ORM\OneToMany(mappedBy: 'recipe', targetEntity: Review::class)]
+    #[Groups(["review_recipe"])]
     private Collection $review;
 
     public function __construct()
