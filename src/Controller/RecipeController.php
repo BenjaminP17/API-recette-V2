@@ -19,6 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class RecipeController extends AbstractController
 {
     // Création d'une nouvelle recette
+    //!! Gérer la liaison avec ingredient et mesure
     #[Route('/api/create', name: 'app_recipe', methods:['POST'])]
     public function create(Request $Request, 
     EntityManagerInterface $em, 
@@ -47,6 +48,16 @@ class RecipeController extends AbstractController
         $jsonRecipe = $serializer->serialize($recipe, 'json', ['groups' => 'recipe']);
 
         return new JsonResponse($jsonRecipe, Response::HTTP_CREATED, [], true);
+    }
+
+    // Supprimer une recette
+    #[Route('/api/recipe/{id}', name: 'deleteRecipe', methods: ['DELETE'])]
+    public function deleteRecipe(Recipe $recipe, EntityManagerInterface $em): JsonResponse 
+    {
+        $em->remove($recipe);
+        $em->flush();
+
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
     // Création d'un nouvel ingrédient
@@ -79,7 +90,7 @@ class RecipeController extends AbstractController
         return new JsonResponse($jsonRecipesList, Response::HTTP_OK, [], true);
     }
 
-    // Route qui renvoi une recette
+    // Une recette
     #[Route('/api/recipe/{id}', name: 'one_recipe', methods: ['GET'])]
     public function getOneRecipe($id, RecipeRepository $RecipeRepository, SerializerInterface $serializer): JsonResponse
     {
