@@ -64,7 +64,6 @@ class RecipeController extends AbstractController
     }
 
     // Modification d'une recette
-    //!!TODO
     #[Route('/api/recipe/{id}', name:"updateRecipe", methods:['PUT'])]
 
     public function updateRecipe(

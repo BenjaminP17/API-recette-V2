@@ -10,8 +10,13 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[UniqueEntity(
+    fields: ['email', 'nickname'],
+    message: 'Déjà utilisé !',
+)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -22,9 +27,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180, unique: true)]
     #[Groups(["all_users"])]
     #[Assert\Email(
-        message: 'The email {{ value }} is not a valid email.',
+        message: '{{ value }} n\'est pas un mail valide',
     )]
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(message: 'Veuillez renseigner votre email')]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -34,16 +39,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Assert\Regex(
-        pattern:"/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/",
-        message:"Le mot de pass doit contenir minimum 8 characters, une majuscule et minuscule, un chiffre et un character spécial"
-    )]
     #[Assert\NotBlank]
+    #[Assert\Regex(
+        // le # est ajouté en début est fin de regex car il commence par ^ , PHP pense que c'est un délimiteur
+        pattern: '#^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$#',
+        message: '8 charactères minimum, une majuscule, une minuscule, un chiffre et un charactère spécial requis',
+    )]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(["all_users"])]
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(message: 'Veuillez renseigner un pseudo valide')]
     private ?string $nickname = null;
 
     #[ORM\ManyToMany(targetEntity: Recipe::class, inversedBy: 'users')]
