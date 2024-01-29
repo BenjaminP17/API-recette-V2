@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class RecipeController extends AbstractController
@@ -21,7 +22,8 @@ class RecipeController extends AbstractController
     // Création d'une nouvelle recette
     //!! Gérer la liaison avec ingredient et mesure
     #[Route('/api/create', name: 'app_recipe', methods:['POST'])]
-    public function create(Request $Request, 
+    public function create(
+    Request $Request, 
     EntityManagerInterface $em, 
     SerializerInterface $serializer, 
     CategoryRepository $categoryRepository, 
@@ -31,6 +33,7 @@ class RecipeController extends AbstractController
 
         $content = $Request->toArray();
 
+        //sélection de la categorie
         $idCategory = $content['idCategory'];
 
         // Association de plusieurs ingrédients à une recette
@@ -50,15 +53,53 @@ class RecipeController extends AbstractController
         return new JsonResponse($jsonRecipe, Response::HTTP_CREATED, [], true);
     }
 
-    // Supprimer une recette
+    // Suppression d'une recette
     #[Route('/api/recipe/{id}', name: 'deleteRecipe', methods: ['DELETE'])]
     public function deleteRecipe(Recipe $recipe, EntityManagerInterface $em): JsonResponse 
     {
         $em->remove($recipe);
         $em->flush();
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        return new JsonResponse(['message' => 'La recette a bien été supprimée.']);
     }
+
+    // Modification d'une recette
+    //!!TODO
+    #[Route('/api/recipe/{id}', name:"updateRecipe", methods:['PUT'])]
+
+    public function updateRecipe(
+    Request $request, 
+    SerializerInterface $serializer, 
+    Recipe $currentRecipe, 
+    EntityManagerInterface $em, 
+    RecipeRepository $recipeRepository,
+    CategoryRepository $categoryRepository,
+    IngredientRepository $ingredientRepository): JsonResponse 
+    {
+        $updatedRecipe = $serializer->deserialize($request->getContent(), 
+                Recipe::class, 
+                'json', 
+                [AbstractNormalizer::OBJECT_TO_POPULATE => $currentRecipe]);
+
+        $content = $request->toArray();
+
+        $idCategory = $content['idCategory'];
+
+        // Association de plusieurs ingrédients à une recette
+        if (isset($content['idIngredient']) && is_array($content['idIngredient'])) {
+            foreach ($content['idIngredient'] as $idIngredient) {
+                $updatedRecipe->addIngredient($ingredientRepository->find($idIngredient));
+            }
+        }
+
+        $updatedRecipe->addCategory($categoryRepository->find($idCategory));
+        
+        $em->persist($updatedRecipe);
+        $em->flush();
+
+        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
+   }
+
 
     // Création d'un nouvel ingrédient
     #[Route('/api/create/ingredient', name: 'create_ingredient', methods:['POST'])]

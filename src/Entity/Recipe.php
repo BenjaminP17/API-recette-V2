@@ -47,7 +47,7 @@ class Recipe
     #[Groups(["recipe"])]
     private Collection $ingredient;
 
-    #[ORM\OneToMany(mappedBy: 'recipe', targetEntity: Step::class, cascade:['persist'])]
+    #[ORM\OneToMany(mappedBy: 'recipe', targetEntity: Step::class, cascade:['persist', 'remove'])]
     #[Groups(["recipe"])]
     private Collection $step;
 
