@@ -1,12 +1,15 @@
 # API REST recettes de cuisines :fork_and_knife:
 ![Symfony](https://img.shields.io/badge/symfony-%23000000.svg?style=for-the-badge&logo=symfony&logoColor=white)
 
-Projet développé dans le but de mettre en pratique mon apprentissage de PHP/Symfony, et d'y être partagé via mon [portfolio](https://www.benjaminpelissier.com).
+API qui regroupe des recettes de cuisine du monde.
+
+Projet développé dans le but de mettre en 
+pratique mon apprentissage de PHP/Symfony, et d'y être partagé via mon [portfolio](https://www.benjaminpelissier.com).
 
 
 ## Documentation 📖
 
-[Documentation complète](https://linktodocumentation)
+[Documentation complète](https://linktodocumentation) (en cours d'écriture)
 
 ## Pré-requis :white_check_mark:
 
