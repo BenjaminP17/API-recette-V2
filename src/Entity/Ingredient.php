@@ -23,7 +23,7 @@ class Ingredient
     #[ORM\ManyToMany(targetEntity: Recipe::class, mappedBy: 'ingredient')]
     private Collection $recipes;
 
-    #[ORM\ManyToMany(targetEntity: Measure::class, inversedBy: 'ingredients')]
+    #[ORM\ManyToMany(targetEntity: Measure::class, inversedBy: 'ingredients', cascade:['persist'])]
     #[Groups(["recipe"])]
     private Collection $measure;
 

@@ -5,9 +5,13 @@ namespace App\Controller;
 use App\Entity\Recipe;
 use App\Entity\Category;
 use App\Entity\Ingredient;
+use App\Entity\Measure;
+use App\Entity\Step;
 use App\Repository\RecipeRepository;
+use App\Repository\MeasureRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\IngredientRepository;
+use App\Repository\StepRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,39 +23,36 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class RecipeController extends AbstractController
 {
-    // Création d'une nouvelle recette
-    //!! Gérer la liaison avec ingredient et mesure
+    // Création d'une nouvelle recette (association d'une catégorie existante seulement)
     #[Route('/api/create', name: 'app_recipe', methods:['POST'])]
     public function create(
     Request $Request, 
     EntityManagerInterface $em, 
-    SerializerInterface $serializer, 
-    CategoryRepository $categoryRepository, 
-    IngredientRepository $ingredientRepository): JsonResponse
-    {
-        $recipe = $serializer->deserialize($Request->getContent(), Recipe::class, 'json');
+    SerializerInterface $serializer,
+    CategoryRepository $categoryRepository
+    ): JsonResponse 
+        {
 
-        $content = $Request->toArray();
+            $recipe = $serializer->deserialize($Request->getContent(), Recipe::class, 'json');
 
-        //sélection de la categorie
-        $idCategory = $content['idCategory'];
+            // Récupération de l'ensemble des données envoyées sous forme de tableau
+            $content = $Request->toArray();
 
-        // Association de plusieurs ingrédients à une recette
-        if (isset($content['idIngredient']) && is_array($content['idIngredient'])) {
-            foreach ($content['idIngredient'] as $idIngredient) {
-                $recipe->addIngredient($ingredientRepository->find($idIngredient));
-            }
+            // Récupération de l'idCategory.
+            $idCategory = $content['idCategory'];
+
+            // Si la category n'existe pas, alors null sera retourné.
+            $recipe->addCategory($categoryRepository->find($idCategory));
+
+            $em->persist($recipe);
+            $em->flush();
+
+            $jsonRecipe = $serializer->serialize($recipe, 'json', ['groups' => 'recipe']);
+
+            return new JsonResponse($jsonRecipe, Response::HTTP_CREATED, [], true);
         }
+    
 
-        $recipe->addCategory($categoryRepository->find($idCategory));
-
-        $em->persist($recipe);
-        $em->flush();
-
-        $jsonRecipe = $serializer->serialize($recipe, 'json', ['groups' => 'recipe']);
-
-        return new JsonResponse($jsonRecipe, Response::HTTP_CREATED, [], true);
-    }
 
     // Suppression d'une recette
     #[Route('/api/recipe/{id}', name: 'deleteRecipe', methods: ['DELETE'])]
@@ -132,7 +133,9 @@ class RecipeController extends AbstractController
 
     // Une recette
     #[Route('/api/recipe/{id}', name: 'one_recipe', methods: ['GET'])]
-    public function getOneRecipe($id, RecipeRepository $RecipeRepository, SerializerInterface $serializer): JsonResponse
+    public function getOneRecipe($id, 
+    RecipeRepository $RecipeRepository, 
+    SerializerInterface $serializer): JsonResponse
     {
         $recipe = $RecipeRepository->find($id);
 
@@ -140,16 +143,8 @@ class RecipeController extends AbstractController
 
         return new JsonResponse($JsonRecipe, Response::HTTP_OK, [], true);
     }
-    //!!TODO
-    // Route qui permet la recherche de recettes (barre de recherche)
 
-    // #[Route('/api/search/recipe', name: 'search_recipe', methods: ['GET'])]
-
-    // public function searchRecipe(SerializerInterface $serializer,
-    // Request $Request, EntityManagerInterface $em): JsonResponse
-    // {
-    //     $keyWord = $Request->query->get('term');
-    // }
+    
     
 
 }

@@ -54,4 +54,19 @@ class RecipeRepository extends ServiceEntityRepository
         ->getQuery()
         ->getOneOrNullResult();
     }
+
+     /**
+     * Recherche les recettes par mot-clé.
+     *
+     * @param string $keyword Le terme de recherche
+     * @return Recipe[] Un tableau d'objets Recipe correspondant aux recettes trouvées
+     */
+    public function findByKeyword(string $keyword): array
+    {
+        return $this->createQueryBuilder('r')
+            ->where('r.name LIKE :keyword')
+            ->setParameter('keyword', '%' . $keyword . '%')
+            ->getQuery()
+            ->getResult();
+    }
 }

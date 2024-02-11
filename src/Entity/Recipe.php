@@ -20,7 +20,7 @@ class Recipe
     // "UNIQUE" permet de définir en BDD qu'il ne peut y avoir un doublon de données 
     //(ex : deux fois la donnée "carotte")
     #[ORM\Column(length: 255, unique: true)]
-    #[Groups(["recipe", "all_recipe"])]
+    #[Groups(["recipe", "all_recipe", "search"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 2083, nullable: true)]
@@ -39,11 +39,11 @@ class Recipe
     #[Groups(["recipe"])]
     private ?int $servings = null;
 
-    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'recipes')]
+    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'recipes',cascade:['persist', 'remove'] )]
     #[Groups(["recipe"])]
     private Collection $category;
 
-    #[ORM\ManyToMany(targetEntity: Ingredient::class, inversedBy: 'recipes')]
+    #[ORM\ManyToMany(targetEntity: Ingredient::class, inversedBy: 'recipes',cascade:['persist', 'remove'])]
     #[Groups(["recipe"])]
     private Collection $ingredient;
 
